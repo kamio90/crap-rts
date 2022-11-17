@@ -1,27 +1,23 @@
 import * as THREE from "three";
 import "./style.css";
+import { Camera } from "./wrappers/three/camera/camera.wrapper";
+import { Renderer } from "./wrappers/three/renderer/renderer.wrapper";
+import { Scene } from "./wrappers/three/scene/scene.wrapper";
 
-//SAMPLE CODE TO CHECK IF THREE SETUP IS PROPER
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+const canvas = document.querySelector("#game-scene") as HTMLCanvasElement;
+const scene = new Scene();
+const camera = new Camera();
+const renderer = new Renderer({ canvas: canvas, antialias: true });
 
-const renderer = new THREE.WebGLRenderer({
-  canvas: document.querySelector("#game-scene") as HTMLCanvasElement,
-});
+scene.AddEntityToScene(camera.m_Camera, "main_camera");
 
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.setZ(30);
-const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-const material = new THREE.MeshBasicMaterial({
-  color: 0xff6347,
-  wireframe: true,
-});
-const torus = new THREE.Mesh(geometry, material);
-scene.add(torus);
-renderer.render(scene, camera);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+scene.AddEntityToScene(cube, "cube");
+const tick = () => {
+  renderer.Render(scene.m_Scene, camera.m_Camera);
+  window.requestAnimationFrame(tick);
+};
+
+tick();
